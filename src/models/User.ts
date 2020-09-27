@@ -1,35 +1,27 @@
-import { uuid } from 'uuidv4';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
+@Entity('users')
 class User {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
   name: string;
 
+  @Column()
   email: string;
 
+  @Column()
   maritalStatus: string;
 
+  @Column()
   cpf: string;
 
+  @Column()
   city: string;
 
+  @Column()
   state: string;
-
-  constructor(
-    name: string,
-    email: string,
-    maritalStatus: string,
-    cpf: string,
-    city: string,
-    state: string,
-  ) {
-    this.name = name;
-    this.email = email;
-    this.maritalStatus = maritalStatus;
-    this.cpf = cpf;
-    this.city = city;
-    this.state = state;
-  }
 }
 
 export default User;

@@ -1,24 +1,61 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { Router } from 'express';
+import { request, Router } from 'express';
+import { getCustomRepository } from 'typeorm';
+import UsersRepository from '../repositories/UsersRepository';
 
-import User from '../models/User';
-
-const cpfValidator = require('cpf-val');
+import CreateUserService from '../services/CreateUserService';
 
 const usersRouter = Router();
 
-const users: User[] = [];
+usersRouter.get('/', async (request, response) => {
+  const usersRepository = getCustomRepository(UsersRepository);
+  const users = await usersRepository.find();
 
-usersRouter.post('/', (request, response) => {
-  const { name, email, maritalStatus, cpf, city, state } = request.body;
+  return response.json(users);
+});
 
-  if (!cpfValidator(cpf)) {
-    return response.status(400).json({ message: 'Esse cpf é inválido' });
+usersRouter.get('/:id', async (request, response) => {
+  const usersRepository = getCustomRepository(UsersRepository);
+  const user = await usersRepository.findOne(request.params.id);
+
+  return response.json(user);
+});
+
+usersRouter.post('/', async (request, response) => {
+  try {
+    const { name, email, maritalStatus, cpf, city, state } = request.body;
+
+    const createUser = new CreateUserService();
+
+    const user = await createUser.execute({
+      name,
+      email,
+      maritalStatus,
+      cpf,
+      city,
+      state,
+    });
+
+    return response.json(user);
+  } catch (err) {
+    return response.status(400).json({ error: err.message });
   }
+});
+// Atualizar
+usersRouter.put('/:id', async (request, response) => {
+  const usersRepository = getCustomRepository(UsersRepository);
+  const user = await usersRepository.findOne(request.params.id);
+  if (user) {
+    usersRepository.merge(user, request.body);
+    const result = await usersRepository.save(user);
+    return response.json(result);
+  }
+  return response.status(404).json({ message: 'User not found' });
+});
 
-  const user = new User(name, email, maritalStatus, cpf, city, state);
-
-  users.push(user);
+usersRouter.delete('/:id', async (request, response) => {
+  const usersRepository = getCustomRepository(UsersRepository);
+  const user = await usersRepository.delete(request.params.id);
 
   return response.json(user);
 });
