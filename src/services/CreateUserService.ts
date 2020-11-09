@@ -26,12 +26,6 @@ class CreateUserService {
   }: Request): Promise<User> {
     const usersRepository = getCustomRepository(UsersRepository);
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const cpfValidator = require('cpf-val');
-    if (!cpfValidator(cpf)) {
-      throw new AppError('Esse cpf é inválido', 400);
-    }
-
     const user = usersRepository.create({
       name,
       email,
@@ -40,6 +34,8 @@ class CreateUserService {
       city,
       state,
     });
+
+    console.log(user);
 
     await usersRepository.save(user);
     return user;
