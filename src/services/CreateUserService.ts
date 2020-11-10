@@ -35,8 +35,6 @@ class CreateUserService {
       state,
     });
 
-    console.log(user);
-
     await usersRepository.save(user);
     return user;
   }
